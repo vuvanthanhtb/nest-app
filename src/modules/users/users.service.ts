@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import aqp from "api-query-params";
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -40,8 +40,6 @@ export class UsersService {
   }
 
   async findAll(query: string, pageIndex: number, pageSize: number) {
-    if (!pageIndex) pageIndex = 1;
-    if (!pageSize) pageSize = 10;
     const { filter = {}, sort } = aqp(query);
 
     const totalItems = (await this.userModel.find(filter)).length;
@@ -67,12 +65,18 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    return this.userModel.updateOne({
+      _id: updateUserDto._id
+    }, { ...updateUserDto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(_id: string) {
+    if (!mongoose.isValidObjectId(_id)) {
+      throw new BadRequestException("_id không hợp lệ");
+    }
+
+    return await this.userModel.deleteOne({ _id });
   }
 }
 

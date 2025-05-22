@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserQueryDto } from './dto/create-query.dto';
 
 @Controller('users')
 export class UsersController {
@@ -14,12 +15,9 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(
-    @Query() query: string,
-    @Query("pageIndex") pageIndex: string = "1",
-    @Query("pageSize") pageSize: string = "10"
-  ) {
-    return await this.usersService.findAll(query, +pageIndex, +pageSize);
+  async findAll(@Query() query: UserQueryDto) {
+    console.log(query)
+    return await this.usersService.findAll(query.query, query.pageIndex, query.pageSize);
   }
 
   @Get(':id')
@@ -27,13 +25,15 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  @Patch()
+  update(@Body() updateUserDto: UpdateUserDto) {
+    console.log(11111, updateUserDto);
+    
+    return this.usersService.update(updateUserDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }
