@@ -1,15 +1,66 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import aqp from "api-query-params";
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './schema/user.schema';
+import { hashPasswordHelper } from '@/helpers/utils';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(@InjectModel(User.name) private userModel: Model<User>) { }
+
+  hasEmailExist = async (email: string) => {
+    const hasExist = await this.userModel.exists({ email });
+    return !!hasExist;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async create(createUserDto: CreateUserDto) {
+    const { name, email, password, phone, address, image } = createUserDto;
+
+    const hasEmail = await this.hasEmailExist(email);
+    if (hasEmail) {
+      throw new BadRequestException(`Email: ${email} đã tồn tại. Vui lòng sử dụng email khác.`)
+    }
+
+    const hashPassword = await hashPasswordHelper(password);
+    const newUser = await this.userModel.create({
+      name,
+      email,
+      password: hashPassword,
+      phone,
+      address,
+      image
+    });
+
+    return {
+      _id: newUser._id
+    };
+  }
+
+  async findAll(query: string, pageIndex: number, pageSize: number) {
+    if (!pageIndex) pageIndex = 1;
+    if (!pageSize) pageSize = 10;
+    const { filter = {}, sort } = aqp(query);
+
+    const totalItems = (await this.userModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const skip = (pageIndex - 1) * (pageSize);
+
+    const result = await this.userModel
+      .find(filter)
+      .limit(pageSize)
+      .skip(skip)
+      .select("-password")
+      .sort(sort as any);
+    return {
+      data: result,
+      totalPages,
+      totalItems,
+      pageSize,
+      pageIndex
+    }
   }
 
   findOne(id: number) {
@@ -24,3 +75,4 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 }
+
