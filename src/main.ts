@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  DocumentBuilder,
+  SwaggerDocumentOptions,
+  SwaggerModule,
+} from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -18,8 +22,15 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('nest')
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/swagger', app, documentFactory);
+  const options: SwaggerDocumentOptions = {
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+  };
+  const documentFactory = () =>
+    SwaggerModule.createDocument(app, config, options);
+
+  SwaggerModule.setup('api/v1/swagger', app, documentFactory, {
+    jsonDocumentUrl: 'swagger/json',
+  });
 
   app.setGlobalPrefix('api/v1', { exclude: [''] });
   app.useGlobalPipes(
