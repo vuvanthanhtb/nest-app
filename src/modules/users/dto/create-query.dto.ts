@@ -1,10 +1,10 @@
-import { Type } from "class-transformer";
-import { IsInt, IsOptional, IsString } from "class-validator";
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class UserQueryDto {
   @IsOptional()
   @IsString()
-  query: string = "";
+  query: string = '';
 
   @Type(() => Number)
   @IsInt()

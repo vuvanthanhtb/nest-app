@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,18 +15,21 @@ import { UserQueryDto } from './dto/create-query.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto)
+    console.log(createUserDto);
     return this.usersService.create(createUserDto);
   }
 
   @Get()
   async findAll(@Query() query: UserQueryDto) {
-    console.log(query)
-    return await this.usersService.findAll(query.query, query.pageIndex, query.pageSize);
+    return await this.usersService.findAll(
+      query.query,
+      query.pageIndex,
+      query.pageSize,
+    );
   }
 
   @Get(':id')
@@ -27,8 +39,6 @@ export class UsersController {
 
   @Patch()
   update(@Body() updateUserDto: UpdateUserDto) {
-    console.log(11111, updateUserDto);
-    
     return this.usersService.update(updateUserDto);
   }
 

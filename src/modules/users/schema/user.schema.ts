@@ -1,4 +1,3 @@
-
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
@@ -24,10 +23,10 @@ export class User {
   @Prop()
   image: string;
 
-  @Prop({ default: "USERS" })
+  @Prop({ default: 'USERS' })
   role: string;
 
-  @Prop({ default: "LOCAL" })
+  @Prop({ default: 'LOCAL' })
   accountType: string;
 
   @Prop({ default: false })

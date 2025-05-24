@@ -5,10 +5,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn'],
+  });
 
   const configService = app.get(ConfigService);
-  const port = configService.get('PORT');
+  const port = configService.get<number>('PORT') ?? 3000;
 
   const config = new DocumentBuilder()
     .setTitle('Nest project')
@@ -19,12 +21,14 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/swagger', app, documentFactory);
 
-  app.setGlobalPrefix('api/v1', { exclude: [''] })
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true
-  }));
+  app.setGlobalPrefix('api/v1', { exclude: [''] });
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
   await app.listen(port);
 }
 
-bootstrap();
+void bootstrap();
