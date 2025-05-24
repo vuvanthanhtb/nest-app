@@ -7,6 +7,21 @@ export const hashPasswordHelper = async (
   try {
     return await bcrypt.hash(plainPassword, saltRounds);
   } catch (error) {
-    console.log(error);
+    const errorMessage =
+      error && typeof error === 'object' && 'message' in error
+        ? (error as { message: string }).message
+        : String(error);
+    throw new Error(`Error hashing password: ${errorMessage}`);
+  }
+};
+
+export const comparePasswordHelper = async (
+  plainPassword: string,
+  hashedPassword: string,
+): Promise<boolean> => {
+  try {
+    return await bcrypt.compare(plainPassword, hashedPassword);
+  } catch (error) {
+    throw new Error(`Error comparing passwords: ${error}`);
   }
 };
