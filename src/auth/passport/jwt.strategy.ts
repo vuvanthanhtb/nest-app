@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly configService: ConfigService) {
+  constructor(private configService: ConfigService) {
     const jwtSecret = configService.get<string>('JWT_SECRET');
     if (!jwtSecret) {
       throw new Error('JWT_SECRET is not defined in environment variables');
@@ -17,7 +17,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: { sub: string; email: string }) {
-    return { userId: payload.sub, username: payload.email };
+  validate(payload: any) {
+    console.log('JWT Strategy - validate called', { payload });
+    
+    return { _id: payload.sub, username: payload.username };
   }
 }

@@ -12,25 +12,25 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.usersService.findByEmail(email);
-    if (!user) {
+  async validateUser(username: string, password: string): Promise<User | null> {
+    const foundUser = await this.usersService.findByEmail(username);
+    if (!foundUser) {
       return null;
     }
 
     const isValidPassword = await comparePasswordHelper(
       password,
-      user.password,
+      foundUser.password,
     );
 
     if (!isValidPassword) {
       return null;
     }
 
-    return user;
+    return foundUser;
   }
 
-  login(user: LoginDto): { access_token: string } {
+  login(user: any): { access_token: string } {
     const payload = { username: user.email, sub: user._id };
     return {
       access_token: this.jwtService.sign(payload),
