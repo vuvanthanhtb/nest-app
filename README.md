@@ -12,3 +12,5 @@ https://docs.nestjs.com/recipes/crud-generator
 ```nest g resource users --no-spec```
 
 https://docs.nestjs.com/techniques/configuration
+
+https://nest-modules.github.io/mailer/docs/mailer
